@@ -1,0 +1,29 @@
+body {
+    background-color: #333;
+    margin: 0;
+}
+
+a {
+    color: #15ADFF;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+#view {
+    margin: 0px 10px;
+}
+
+#view li {
+    display: inline;
+    margin: 0 10px 0 0;
+}
+
+#command {
+    color: #888;
+    text-align: right;  
+    margin: 5px 5px 0;
+}
+
+#command a {
+    color: #ccc;
+}

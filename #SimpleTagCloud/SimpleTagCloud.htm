@@ -1,0 +1,103 @@
+<html>
+ 
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <link type="text/css" rel="stylesheet" href="./SimpleTagCloud.css">
+  <script type="text/javascript" src="../prototype.js"></script>
+  <script type="text/javascript" src="../wblib.js"></script>
+</head>
+
+<body>
+  <script type="text/javascript">
+    var limit = 1000; // limit search items
+    var mode  = 1;    // 0 = follow, 1 = fixed
+    var f_min = 10; // px, min font size at c_min
+    var f_max = 28; // px, max font size at c_max
+
+    ////////////////////////////////////////////////////////////////////////////
+
+    var flag  = true;
+    var tags  = {};
+    var c_min = Math.log(1);
+    var c_max = Math.log(129);
+
+    wb.onExtensionUpdated = function(){
+      if (wb.getFocusThum() == 0) return;
+      make();
+    };
+
+    var add = function(title, length, size){
+      title = wb.htmlDecode(title);
+      new Insertion.Bottom(
+        $E("view"),
+        "<li><a style='font-size: " + size + "px' title='" + length + "items' href='javascript:wb.find(\"" + title + "\")'>" + title + "</a></li>"
+      );
+    };
+
+    // via. http://www.magicvox.net/archive/2008/04091135/
+    var calc = function(cnt){
+      return (f_min + (f_max - f_min) * (Math.log(cnt) - c_min) / (c_max - c_min));
+    };
+
+    var get = function(){
+      tags = {};
+      var max = (wb.getFindInfo().result > limit)? limit: -1;
+      wb.getInfos(0, max, '', '', mode).pluck('tags').flatten().sort().each(function(tag){
+        tags[tag] = ++tags[tag] || 1;
+      });
+      return tags;
+    };
+
+    var make = function(){
+      if (flag){
+        $E("view").innerHTML = "";
+        var tags = get();
+        for (var tag in tags){
+          add(tag, tags[tag], calc(tags[tag]));
+        };
+      };
+    };
+
+    var toggle = function(){
+      var button = $E("mode");
+      if (mode == 0){
+        button.innerHTML = "fixed"
+        mode = 1;
+        make();
+        flag = false;
+      } else {
+        button.innerHTML = "follow"
+        mode = 0;
+        flag = true;
+        make();
+      };
+    };
+
+    var update = function(){
+      org = flag;
+      flag = true;
+      make();
+      flag = org;
+    };
+
+    var $E = function (id) { return document.getElementById(id) };
+</script>
+
+<!-- 表示エリア -->
+<div id="command">
+  [<a id="mode"   href="javascript:toggle()">fixed</a>]
+  [<a id="update" href="javascript:update()">update</a>]
+</div>
+<ul id="view"></ul>
+
+<!-- コンフィグ -->
+<div id="config">
+  skin-version : 1;
+  thum-width   : 0;
+  thum-height  : 0;
+  thum-column  : 0;
+  thum-row     : 0;
+</div>
+</body>
+
+</html>
