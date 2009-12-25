@@ -1,0 +1,65 @@
+body {
+    background-color: #3e3e3e;
+    margin: 0px;
+    padding: 0px;
+}
+
+a {
+    cursor: pointer;
+}
+
+ul {
+    margin: 10px 5px 5px;
+    display: inline;
+}
+
+li {
+    display: inline;
+    margin-left: 10px;
+}
+
+
+.box {
+    background-color: #3e3e3e;
+    color: #fff;
+    font-family: Tahoma, Arial, Helvetica, Sans-serif;
+    margin-bottom: 3px;
+    padding: 10px 0;
+}
+
+.box a {
+    background-color: #3e3e3e;
+    color: #fff;
+    margin: 2px;
+    padding: 2px 0 2px 2px;
+    text-decoration: none;
+}
+
+.box .bar {
+    background-color: #606060;
+    border: 1px solid #ddd;
+    border-left-style: none;
+    color: #ffffff;
+    display: inline;
+    font-weight: bold;
+    margin: 0;
+    padding: 3px 10px;
+    text-align: right;
+    width: 15%;
+}
+
+.box .bar a {
+    background-color: transparent;
+}
+.box #tool a {
+    font-size: x-small;
+}
+
+#main,
+#main a{
+    background-color: #606060 !important;
+}
+
+#Candidate{}
+#Selection{}
+

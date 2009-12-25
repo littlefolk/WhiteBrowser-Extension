@@ -1,0 +1,122 @@
+<html>
+ 
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <link type="text/css" rel="stylesheet" href="./TagInputRelation.css">
+  <script type="text/javascript" src="../prototype.js"></script>
+  <script type="text/javascript" src="../wblib.js"></script>
+</head>
+
+<body>
+  <script type="text/javascript">
+    var SaveAfterAction = true;
+
+    wb.onExtensionUpdated = function(){
+      if (wb.getFocusThum() == 0) return;
+      var element = $E("Selection");
+      element.innerHTML = "";
+      GetRelation().each(function(str){
+        var id = str;
+        if (!$E(id)) new Insertion.Bottom(element, MakeLink(id, "TagInputSet", str));
+      });
+    };
+
+    var TagInputSet = function(id){
+      var element = $E(id);
+      new Insertion.Bottom($E("Candidate"), MakeLink(id, "TagInputDel", element.innerText));
+      element.parentNode.removeChild(element);
+    };
+
+    var TagInputDel = function(id){
+      var element = $E(id);
+      new Insertion.Bottom($E("Selection"), MakeLink(element.id, "TagInputSet", element.innerText));
+      element.parentNode.removeChild(element);
+    };
+
+    var TagInputAllToggle = function(){
+      if ($E("Selection").innerHTML){
+        TagInputAllSet();
+      } else {
+        TagInputAllDel();
+      };
+    };
+
+    var TagInputAllSet = function(){
+      GetTagList("Selection").each(function(a){ TagInputSet(a.parentNode.id) });
+    };
+
+    var TagInputAllDel = function(){
+      GetTagList("Candidate").each(function(a){ TagInputDel(a.parentNode.id) });
+    };
+
+    var TagInputSort = function(){
+      GetTagList("Candidate").sortBy(function(a){ return a.innerText }).each(function(a){ TagInputSet(a.parentNode.id) });
+      GetTagList("Selection").sortBy(function(a){ return a.innerText }).each(function(a){ TagInputDel(a.parentNode.id) });
+    };
+
+    var TagInputClear = function(){
+      if ($E("Candidate").innerHTML || $E("Selection").innerHTML){
+        $E("Candidate").innerHTML = "";
+        $E("Selection").innerHTML = "";
+      } else {
+        wb.onExtensionUpdated();
+      };
+    };
+
+    var TagInputSave = function(){
+      GetTagList("Candidate").each(function(a){ wb.addTag(wb.htmlDecode(a.innerText)) });
+      if (SaveAfterAction){
+        TagInputClear();
+        wb.onExtensionUpdated();
+      };
+    };
+
+
+    var GetRelation = function(){
+      var files = wb.getSelectThums();
+      var limit = (files.length < 3)? 5: 3;
+      return files.map(function(file){
+        return wb.getRelation(wb.getInfo(file).title, limit).map(function(v){ return v.tags });
+      }).flatten().uniq().sort();
+    };
+
+    var GetTagList = function(id){
+      return $(id).select("a");
+    };
+
+    var MakeLink = function(id, click, inner){
+      return "<li id='" + id + "'><a onclick=\"javascript:" + click + "('" + id + "')\">" + inner + "</a></li>"
+    };
+
+    var $E = function (id) { return document.getElementById(id) };
+</script>
+
+<!-- 表示エリア -->
+<div id="view">
+  <div id="main" class="box">
+    <div class="bar">
+      <a onclick="javascript:TagInputSave()">Save</a>
+    </div>
+    <ul id="Candidate"></ul>
+  </div>
+  <div class="box">
+    <div id="tool" class="bar">
+      <a onclick="javascript:TagInputClear()">Clear</a>
+      <a onclick="javascript:TagInputSort()">Sort</a>
+      <a onclick="javascript:TagInputAllToggle()">All</a>
+    </div>
+    <ul id="Selection"></ul>
+  </div>
+</div>
+
+<!-- コンフィグ -->
+<div id="config">
+  skin-version : 1;
+  thum-width   : 0;
+  thum-height  : 0;
+  thum-column  : 0;
+  thum-row     : 0;
+</div>
+</body>
+
+</html>
