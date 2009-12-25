@@ -51,7 +51,7 @@ li {
 .box .bar a {
     background-color: transparent;
 }
-.box #tool a {
+.box .bar a.tool {
     font-size: x-small;
 }
 

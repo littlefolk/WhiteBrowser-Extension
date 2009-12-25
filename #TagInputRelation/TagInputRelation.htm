@@ -71,6 +71,13 @@
       };
     };
 
+    var TagInputPrompt = function(){
+      var input = window.prompt("新たに追加するタグを入力してください（空白区切りで複数タグ）。", "");
+      $w(input).each(function(str){
+        new Insertion.Bottom($E("Candidate"), MakeLink(str, "TagInputDel", str));
+      });
+    };
+
 
     var GetRelation = function(){
       var files = wb.getSelectThums();
@@ -95,15 +102,16 @@
 <div id="view">
   <div id="main" class="box">
     <div class="bar">
-      <a onclick="javascript:TagInputSave()">Save</a>
+      <a class="tool" onclick="javascript:TagInputPrompt()">Add</a>
+      <a class="save" onclick="javascript:TagInputSave()">Save</a>
     </div>
     <ul id="Candidate"></ul>
   </div>
   <div class="box">
-    <div id="tool" class="bar">
-      <a onclick="javascript:TagInputClear()">Clear</a>
-      <a onclick="javascript:TagInputSort()">Sort</a>
-      <a onclick="javascript:TagInputAllToggle()">All</a>
+    <div class="bar">
+      <a class="tool" onclick="javascript:TagInputClear()">Clear</a>
+      <a class="tool" onclick="javascript:TagInputSort()">Sort</a>
+      <a class="tool" onclick="javascript:TagInputAllToggle()">All</a>
     </div>
     <ul id="Selection"></ul>
   </div>
