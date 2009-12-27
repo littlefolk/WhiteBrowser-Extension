@@ -4,46 +4,46 @@
  Summary
 ---------
 
-����ڂ��^�O�N���E�h�G�N�X�e���V�����B
-�\�����Ă���t�@�C������^�O�N���E�h���쐬���܂�(�������\�����������ꍇ�͍ŐV1000���Ō�����ł��~��)�B
-�Œ胂�[�h�ƍX�V���[�h������A�ړI�ɉ����ă^�O�N���E�h�X�V�̃^�C�~���O��؂�ւ��Ďg���܂��B
+しょぼいタグクラウドエクステンション。
+表示しているファイルからタグクラウドを作成します(ただし表示数が多い場合は最新1000件で検索を打ち止め)。
+固定モードと更新モードがあり、目的に応じてタグクラウド更新のタイミングを切り替えて使えます。
 
 
  Function
 ----------
 
 fixed
-    �Œ胂�[�h�B
-    �ŏ��Ƀ^�O�N���E�h���쐬��A��ʕ\�����ς��Ă��^�O�N���E�h�̍X�V�͂��Ȃ��B
-    �N���b�N�����follow���[�h�ɕύX�B
+    固定モード。
+    最初にタグクラウドを作成後、画面表示が変ってもタグクラウドの更新はしない。
+    クリックするとfollowモードに変更。
 
 follow
-    �X�V���[�h�B
-    �������ʂ��ς�邽�тɁA�V�����t�@�C�����X�g�����ɂ��ă^�O�N���E�h���쐬���čX�V����B
-    �N���b�N�����fixed���[�h�ɕύX�B
+    更新モード。
+    検索結果が変わるたびに、新しいファイルリストを元にしてタグクラウドを作成して更新する。
+    クリックするとfixedモードに変更。
 
 update
-    ���[�h�͂��̂܂܂ŁA�^�O�N���E�h���X�V�B
+    モードはそのままで、タグクラウドを更新。
 
 
  Thanks
 --------
 
-�v�Z���́A[�^�O�N���E�h�̃t�H���g�T�C�Y�̌v�Z���ɂ��� - Open MagicVox.net](http://www.magicvox.net/archive/2008/04091135/)���Q�l�ɂ����Ă��������܂����B
+計算式は、[タグクラウドのフォントサイズの計算式について - Open MagicVox.net](http://www.magicvox.net/archive/2008/04091135/)を参考にさせていただきました。
 
 
  Version
 ---------
 
 v1.2(2009/12/27)
-    �R�����g���Q�l�ɁA�^�O�N���E�h�쐬�̃^�C�~���O��ύX
-        *   �Ăяo����
-        *   �^�O�X�V��
-        *   ���C����ʍX�V��(follow���[�h)
+    コメントを参考に、タグクラウド作成のタイミングを変更
+        *   呼び出し時
+        *   タグ更新時
+        *   メイン画面更新時(followモード)
 
 v1.1(2009/12/20)
-    prototype.js���ŐV�Ŗ����ꍇ�ɃG���[���o�Ă��̂��C�����܂���
+    prototype.jsが最新で無い場合にエラーが出てたのを修正しました
 
 v1.0(2009/12/19)
-    ���J
+    公開
 
