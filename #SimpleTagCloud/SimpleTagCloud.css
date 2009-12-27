@@ -11,11 +11,13 @@ a {
 
 #view {
     margin: 0px 10px;
+    word-break: break-all;
 }
 
 #view li {
     display: inline;
-    margin: 0 10px 0 0;
+    margin: 0 8px 0 0;
+    padding: 0;
 }
 
 #command {
