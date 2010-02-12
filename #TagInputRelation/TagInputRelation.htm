@@ -1,130 +1,186 @@
 <html>
- 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <link type="text/css" rel="stylesheet" href="./TagInputRelation.css">
-  <script type="text/javascript" src="../prototype.js"></script>
+  <script type="text/javascript" src="./prototype.js"></script>
   <script type="text/javascript" src="../wblib.js"></script>
-</head>
 
+  <link rel="stylesheet" href="./blueprint/screen.css" type="text/css" media="screen, projection"> 
+  <!--[if lt IE 8]><link rel="stylesheet" href="./blueprint/ie.css" type="text/css" media="screen, projection"><![endif]--> 
+
+  <style type="text/css">
+
+  body
+  {
+    background-color: #000;
+    text-align: center;
+    margin-top: 3px;
+  }
+
+  a
+  {
+    color: #fff;
+    cursor: pointer;
+    text-decoration: none;
+    margin-right: 0.5em;
+    font-weight: bold;
+  }
+
+  ul
+  {
+    margin: 10px 0px 5px;
+    padding: 0 5px;
+    display: inline;
+    text-align: left;
+  }
+
+  li
+  {
+    color: #aaacaf;
+    display: inline;
+    margin-right: 1.5em;
+    padding: 0 0;
+  }
+
+  .button
+  {
+    text-align: right;
+    padding: 5px 5px 0 0;
+    margin: 0.2em 0.2em 0 0;
+  }
+
+  </style>
+
+</head>
 <body>
+
   <script type="text/javascript">
-    var SaveAfterAction = true;
+
+    // Saveした後にテキストボックスを空っぽに、する(true) or しない(false)。
+    var SaveAfterReset = true; 
+    // 既にテキストボックスに入力されたタグは候補に、出す(true) or 出さない(false)。
+    var InputDuplication = false;
+    // 類似検索範囲の初期値。
+    var GetRelationLimit = 20;  
+
+    var GetRelationOrig = GetRelationLimit;
 
     wb.onExtensionUpdated = function(){
       if (wb.getFocusThum() == 0) return;
-      var element = $E("Selection");
-      element.innerHTML = "";
-      GetRelation().each(function(str){
-        var id = str;
-        if (!$E(id)) new Insertion.Bottom(element, MakeLink(id, "TagInputSet", str));
-      });
-    };
-
-    var TagInputSet = function(id){
-      var element = $E(id);
-      new Insertion.Bottom($E("Candidate"), MakeLink(id, "TagInputDel", element.innerText));
-      element.parentNode.removeChild(element);
-    };
-
-    var TagInputDel = function(id){
-      var element = $E(id);
-      new Insertion.Bottom($E("Selection"), MakeLink(element.id, "TagInputSet", element.innerText));
-      element.parentNode.removeChild(element);
-    };
-
-    var TagInputAllToggle = function(){
-      if ($E("Selection").innerHTML){
-        TagInputAllSet();
-      } else {
-        TagInputAllDel();
-      };
-    };
-
-    var TagInputAllSet = function(){
-      GetTagList("Selection").each(function(a){ TagInputSet(a.parentNode.id) });
-    };
-
-    var TagInputAllDel = function(){
-      GetTagList("Candidate").each(function(a){ TagInputDel(a.parentNode.id) });
-    };
-
-    var TagInputSort = function(){
-      GetTagList("Candidate").sortBy(function(a){ return a.innerText }).each(function(a){ TagInputSet(a.parentNode.id) });
-      GetTagList("Selection").sortBy(function(a){ return a.innerText }).each(function(a){ TagInputDel(a.parentNode.id) });
-    };
-
-    var TagInputClear = function(){
-      if ($E("Candidate").innerHTML || $E("Selection").innerHTML){
-        $E("Candidate").innerHTML = "";
-        $E("Selection").innerHTML = "";
-      } else {
-        wb.onExtensionUpdated();
-      };
-    };
-
-    var TagInputSave = function(){
-      GetTagList("Candidate").each(function(a){ wb.addTag(wb.htmlDecode(a.innerText)) });
-      if (SaveAfterAction){
-        TagInputClear();
-        wb.onExtensionUpdated();
-      };
-    };
-
-    var TagInputPrompt = function(){
-      var input = window.prompt("新たに追加するタグを入力してください（空白区切りで複数タグ）。", "");
-      $w(input).each(function(str){
-        new Insertion.Bottom($E("Candidate"), MakeLink(str, "TagInputDel", str));
-      });
+      GetRelationLimit = GetRelationOrig;
+      SetRelationTags();
     };
 
 
-    var GetRelation = function(){
+    var ButtonSave = function(){
+      GetInputTags().each(function(tag){ wb.addTag(0, wb.htmlDecode(tag)) });
+      if (SaveAfterReset) ButtonClear();
+    };
+
+    var ButtonClear = function(){
+      Form.Element.clear("input");
+    };
+
+    var ButtonGet = function(){
+      GetRelationLimit *= 1.5;
+      SetRelationTags();
+    };
+
+    var ButtonInclude = function(){
+      SetInput(GetSelectFileTags());
+    };
+
+    var ButtonSet = function(tag){
+      SetInput([tag]);
+      Element.remove($E(tag));
+    };
+
+
+    var GetInputTags = function(){
+      var input = $F("input");
+      return (input)? input.split(/\s?,\s?/): [];
+    };
+
+    var GetRelationTags = function(){
       var files = wb.getSelectThums();
-      var limit = (files.length < 3)? 5: 3;
-      return files.map(function(file){
-        return wb.getRelation(wb.getInfo(file).title, limit).map(function(v){ return v.tags });
+      return files.map(function(id){
+        return wb.getRelation(wb.getInfo(id).title, GetRelationLimit).map(function(v){ return v.tags });
       }).flatten().uniq().sort();
     };
 
-    var GetTagList = function(id){
-      return $(id).getElementsBySelector('a');
+    var GetSelectFileTags = function(){
+      return wb.getSelectThums().map(function(id){ return wb.getInfo(id).tags}).flatten().uniq();
     };
 
-    var MakeLink = function(id, click, inner){
-      return "<li id='" + id + "'><a onclick=\"javascript:" + click + "('" + id + "')\">" + inner + "</a></li>"
+
+    var SetInput = function(tags){
+      Form.Element.setValue($E("input"), GetInputTags().concat(tags).uniq().join(", "));
+    };
+
+    var SetRelationTags = function(){
+      var element = $E("Selection");
+      element.innerHTML = "";
+      GetRelationTags().each(function(str){
+        if (!(!InputDuplication && ~($F("input").indexOf(str))) && !$E(str))
+          new Insertion.Bottom(element, MakeLink(str));
+      });
+    };
+
+
+    var MakeLink = function(str){
+      return "<li id='" + str + "'><img src='./icon/tag_fill_12x12.png' /><a onclick=\"javascript:ButtonSet('" + str + "')\">" + str + "</a></li>";
     };
 
     var $E = function (id) { return document.getElementById(id) };
-</script>
 
-<!-- 表示エリア -->
-<div id="view">
-  <div id="main" class="box">
-    <div class="bar">
-      <a class="tool" onclick="javascript:TagInputPrompt()">Add</a>
-      <a class="save" onclick="javascript:TagInputSave()">Save</a>
-    </div>
-    <ul id="Candidate"></ul>
-  </div>
-  <div class="box">
-    <div class="bar">
-      <a class="tool" onclick="javascript:TagInputClear()">Clear</a>
-      <a class="tool" onclick="javascript:TagInputSort()">Sort</a>
-      <a class="tool" onclick="javascript:TagInputAllToggle()">All</a>
-    </div>
-    <ul id="Selection"></ul>
-  </div>
-</div>
+  </script>
 
-<!-- コンフィグ -->
-<div id="config">
-  skin-version : 1;
-  thum-width   : 0;
-  thum-height  : 0;
-  thum-column  : 0;
-  thum-row     : 0;
-</div>
+
+
+  <div class="container">
+
+    <div class="columm">
+      <div class="span-4 button">
+        <a onclick="javascript:ButtonSave()">
+          <img src="./icon/pen_alt_fill_16x16.png" title="Save" />
+          Save
+        </a>
+      </div>
+      <div class="span-20 last">
+        <input class="span-19 text title" id="input" />
+        <div class="span-1 button">
+          <a class="span0" onclick="javascript:ButtonClear()">
+            <img src="./icon/x_14x14.png" title="Clear" />
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="columm">
+      <div class="span-4 button">
+        <a onclick="javascript:ButtonGet()">
+          <img src="./icon/plus_16x16.png" title="Get" />
+          Get
+        </a>
+        <a onclick="javascript:ButtonInclude()">
+          <img src="./icon/eyedropper_16x16.png" title="Include" />
+          Include
+        </a>
+      </div>
+      <div class="span-20 last">
+        <ul class="span-19" id="Selection">
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="config" class="hide">
+    skin-version : 1;
+    thum-width   : 0;
+    thum-height  : 0;
+    thum-column  : 0;
+    thum-row     : 0;
+  </div>
+
 </body>
-
 </html>
