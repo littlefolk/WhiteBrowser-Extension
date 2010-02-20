@@ -1,0 +1,246 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <script type="text/javascript" src="./prototype.min.js"></script>
+  <script type="text/javascript" src="../wblib.js"></script>
+
+  <script type="text/javascript" src="./JsonFormatter.js"></script>
+
+  <link rel="stylesheet" href="./blueprint/screen.css" type="text/css" media="screen, projection">
+  <!--[if lt IE 8]><link rel="stylesheet" href="./blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
+
+  <style type="text/css">
+
+  *
+  {
+    background-color: #101010 !important;
+    background-image: none !important;
+    color: #bbbbbb !important;
+    border-color: #999999 !important;
+
+    scrollbar-face-color: #101010;
+    scrollbar-3dlight-color: #999999;
+    scrollbar-darkshadow-color: #999999;
+    scrollbar-highlight-color: #101010;
+    scrollbar-shadow-color: #101010;
+    scrollbar-arrow-color: #999999;
+    scrollbar-track-color: #101010;
+  }
+
+  body
+  {
+    text-align: center;
+  }
+
+  a
+  {
+    text-decoration: none;
+  }
+
+  fieldset
+  {
+    text-align: left;
+    border-style: none solid !important;
+    margin: 0 0 !important;
+    padding: 0 1.4em !important;
+  }
+
+  dt,
+  dd
+  {
+    margin-bottom: 3px;
+  }
+
+  label
+  {
+    color: #dddddd !important;
+  }
+
+  img
+  {
+    margin-right: 3px;
+  }
+
+  input
+  {
+    border-width: 1px;
+    border-style: solid;
+  }
+
+  .column div
+  {
+    padding-left: 5px;
+  }
+
+  #jsonview
+  {
+    height: 105px !important;
+  }
+
+  </style>
+
+</head>
+<body>
+
+  <script type="text/javascript">
+
+    // フルパスを対象にする(true) or ファイル名を対象にする(false)。 
+    var FindFullPath = true;
+    // エラーメッセージをポップアップで表示、する(true) or しない(false)。
+    var ErrorMessagePopup = false;
+
+    var jsonData, jsonHash, jsonKeys;
+    var jsonFilePath = "AutoTagging." + wb.getDBName().slice(0, -3) + ".json";
+    var jsonLoad = function(){
+      jsonData = jsonParseFile();
+      jsonHash = $H(jsonData);
+      jsonKeys = jsonHash.keys().map(function(str){ return new RegExp(str, "i") });
+      wb.trace("AutoTagging Load, " + jsonKeys.length + "keys.");
+    };
+    var jsonParseFile = function(){
+      try {
+        return (wb.readFile(jsonFilePath).join("") || '{"str": ["tag1","tag2"]}').evalJSON(true);
+      } catch (e) {
+        ErrorMessage("jsonParseFile (" + e.name + ").");
+        return {};
+      };
+    };
+    var jsonSaveFile = function(data){
+      try {
+        wb.writeFile(jsonFilePath, new Json.Formatter(data.evalJSON(true)).value, 1);
+      } catch (e) {
+        ErrorMessage("jsonSaveFile (" + e.name + ").");
+      };
+    };
+    var jsonFindTags = function(str){
+      return jsonKeys.select(function(key){ return key.test(str) })
+                     .map(function(key){ return jsonHash.get(key.source) }).flatten();
+    };
+
+    var AutoTagging = function(id){
+      var mv = wb.getInfo(id);
+      var SearchPath = ((FindFullPath) ? [mv.drive, mv.dir, mv.title, mv.ext] : [mv.title, mv.ext]).join("");
+      jsonFindTags(SearchPath).each(function(tag){ wb.addTag(id, wb.htmlDecode(tag)) });
+    };
+
+    var ErrorMessage = function(str){
+      str = "AutoTagging ERROR, " + str;
+      (ErrorMessagePopup)?
+        alert(str):
+        wb.trace(str);
+    };
+
+    wb.onSkinEnter = jsonLoad;
+    wb.onRegistedFile = AutoTagging;
+    window.onload = function(){ SetTextarea(jsonData) };
+
+  </script>
+
+  <script defer="defer">
+
+    var $E = function (id) { return document.getElementById(id) };
+    var SetTextarea = function(data){
+      Form.Element.setValue($E("jsonview"), new Json.Formatter(data).value);
+    };
+    var GetTextarea = function(data){
+      return $F($E("jsonview"));
+    };
+
+    var ButtonFormatter = function(){
+      try {
+        SetTextarea(GetTextarea().evalJSON(true));
+      } catch (e) {
+        ErrorMessage("ButtonFormatter (" + e.name + ").");
+      };
+    };
+    var ButtonReload = function(){
+      jsonLoad();
+      SetTextarea(jsonData);
+    };
+    var ButtonSave = function(){
+      jsonSaveFile(GetTextarea());
+      ButtonReload();
+    };
+
+    var ButtonApply = function(flag){
+      wb.getSelectThums().each(AutoTagging);
+    };
+    var ButtonAllApply = function(flag){
+      wb.getInfos(0, -1).each(function(wb){ AutoTagging(wb.id) });
+    };
+
+    var ButtonFind = function(keys){
+      var i = 0, l = keys.length;
+      return function(){
+        if (wb.getFindInfo().find == "") i = 0;
+        if (++i >= l) i = 0;
+        wb.find(keys[i]);
+      };
+    };
+    var ButtonFindRegistDate = ButtonFind([
+       ""
+      ,"{regist_date > date('now')}"                                             // 今日登録されたファイル
+      ,"{regist_date > date('now', '-7 day')}"                                   // 一週間以内に登録されたファイル
+      ,"{regist_date BETWEEN date('now', '-1 months') AND date('now','-7 day')}" // 一週間以上前から一ヶ月以内に登録されたファイル
+      ,"{regist_date < date('now', '-1 months')}"                                // 一ヶ月以上前に登録されたファイル
+    ]);
+    var ButtonFindTags = ButtonFind([
+       ""
+      ,"{tag = ''}" // タグの付いていないファイル
+    ]);
+
+  </script>
+
+
+
+  <div class="container">
+
+    <fieldset>
+
+      <hr class="space" />
+
+      <div class="column span-13 border">
+        <p>
+          <label for="jsonview"><img src="./icon/key_stroke_12x12.png" />Json Data</label><br>
+          <textarea name="jsonview" id="jsonview" rows="5" cols="20" class="span-13"></textarea>
+        </p>
+      </div>
+
+      <div class="column span-10">
+        <div class="span-4">
+          <dl class="column">
+            <dt><label><img src="./icon/document_stroke_12x12.png" />File Actions</label></dt>
+            <dd><input class="span-3" onclick="javascript:ButtonFormatter()" type="submit" value="Formatter"></dd>
+            <dd><input class="span-3" onclick="javascript:ButtonReload()" type="submit" value="Reload"></dd>
+            <dd><input class="span-3" onclick="javascript:ButtonSave()" type="submit" value="Save"></dd>
+          </dl>
+        </div>
+
+        <div class="span-5">
+          <dl class="column">
+            <dt><label><img src="./icon/tag_stroke_12x12.png" />Tag Actions</label></dt>
+            <dd><input class="span-3" onclick="javascript:ButtonApply()" type="submit" value="Select Apply"></dd>
+            <dd><input class="span-3" onclick="javascript:ButtonAllApply()" type="submit" value="All Apply"></dd>
+          </dl>
+          <dl class="column">
+            <dt><a href="javascript:wb.find('')"><label><img src="./icon/magnifying_glass_12x12.png" />Find Actions</label></a></dt>
+            <dd><input class="span-3" onclick="javascript:ButtonFindTags()" type="submit" value="Tags"></dd>
+            <dd><input class="span-3" onclick="javascript:ButtonFindRegistDate()" type="submit" value="RegistDate"></dd>
+          </dl>
+        </div>
+      </div>
+
+    </fieldset>
+
+  </div>
+
+  <div id="config" class="hide">
+    skin-version : 1;
+    thum-width   : 0;
+    thum-height  : 0;
+    thum-column  : 0;
+    thum-row     : 0;
+  </div>
+
+</body>
+</html>
