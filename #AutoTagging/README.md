@@ -140,8 +140,26 @@ AutoTagging.htm自体を編集して下さい。
   * 他のFind Actionsの検索条件案
 
 
+ System Requirements 
+---------------------
+
+  * Windows XP / 7
+  * IE8
+  * Whitebrowser 0.7.2.2
+
+
  Version
 ---------
+
+### v1.1 (2010/02/24) ###
+
+構成・デザインの変更。
+
+  * 中途半端なHTMLだったのをHTML 4.01 Strictに
+  * ボタンデザイン変更
+    * [Sexy Buttons](http://code.google.com/p/sexybuttons/)を使用
+  * 上下に多少の空白を配置
+  * README.mdに動作確認環境を記述
 
 ### v1.0 (2010/02/20) ###
 
@@ -155,5 +173,8 @@ AutoTagging.htm自体を編集して下さい。
   * [prototype.js](http://prototypejs.org/)
   * [blueprint](http://www.blueprintcss.org/)
   * [Iconic](http://somerandomdude.com/projects/iconic/)
+  * [sexybuttons](http://code.google.com/p/sexybuttons/)
   * [JsonFormatter.js](http://dara-j.asablo.jp/blog/2007/05/15/1509590)
+
+<!-- vim: set sw=2 sts=2 ft=markdown : -->
 

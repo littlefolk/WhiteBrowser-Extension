@@ -1,6 +1,12 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="ja">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+
+  <title>AutoTagging</title>
+
   <script type="text/javascript" src="./prototype.min.js"></script>
   <script type="text/javascript" src="../wblib.js"></script>
 
@@ -9,15 +15,13 @@
   <link rel="stylesheet" href="./blueprint/screen.css" type="text/css" media="screen, projection">
   <!--[if lt IE 8]><link rel="stylesheet" href="./blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
 
+  <link rel="stylesheet" href="./SexyButtons/sexybuttons.css" type="text/css">
+
   <style type="text/css">
+  <!--
 
   *
   {
-    background-color: #101010 !important;
-    background-image: none !important;
-    color: #bbbbbb !important;
-    border-color: #999999 !important;
-
     scrollbar-face-color: #101010;
     scrollbar-3dlight-color: #999999;
     scrollbar-darkshadow-color: #999999;
@@ -27,9 +31,13 @@
     scrollbar-track-color: #101010;
   }
 
-  body
+  body,
+  textarea
   {
-    text-align: center;
+    background-color: #101010 !important;
+    background-image: none !important;
+    color: #bbbbbb !important;
+    border-color: #999999 !important;
   }
 
   a
@@ -77,12 +85,20 @@
     height: 105px !important;
   }
 
+  .sexybutton.sexysimple
+  {
+    color: #bbbbbb !important;
+    background-color: #000000 !important;
+  }
+
+  -->
   </style>
 
 </head>
 <body>
 
   <script type="text/javascript">
+  <!--
 
     // フルパスを対象にする(true) or ファイル名を対象にする(false)。 
     var FindFullPath = true;
@@ -134,9 +150,11 @@
     wb.onRegistedFile = AutoTagging;
     window.onload = function(){ SetTextarea(jsonData) };
 
+  // -->
   </script>
 
-  <script defer="defer">
+  <script type="text/javascript" defer="defer">
+  <!--
 
     var $E = function (id) { return document.getElementById(id) };
     var SetTextarea = function(data){
@@ -189,6 +207,7 @@
       ,"{tag = ''}" // タグの付いていないファイル
     ]);
 
+  // -->
   </script>
 
 
@@ -197,37 +216,47 @@
 
     <fieldset>
 
-      <hr class="space" />
-
       <div class="column span-13 border">
+
+        <hr class="space">
+
         <p>
-          <label for="jsonview"><img src="./icon/key_stroke_12x12.png" />Json Data</label><br>
+          <label for="jsonview"><img src="./icon/key_stroke_12x12.png">Json Data</label><br>
           <textarea name="jsonview" id="jsonview" rows="5" cols="20" class="span-13"></textarea>
         </p>
+
+        <hr class="space">
+
       </div>
 
       <div class="column span-10">
+
+        <hr class="space">
+
         <div class="span-4">
           <dl class="column">
-            <dt><label><img src="./icon/document_stroke_12x12.png" />File Actions</label></dt>
-            <dd><input class="span-3" onclick="javascript:ButtonFormatter()" type="submit" value="Formatter"></dd>
-            <dd><input class="span-3" onclick="javascript:ButtonReload()" type="submit" value="Reload"></dd>
-            <dd><input class="span-3" onclick="javascript:ButtonSave()" type="submit" value="Save"></dd>
+            <dt><label><img src="./icon/document_stroke_12x12.png">File Actions</label></dt>
+            <dd><button class="span-3 sexybutton sexysimple sexysmall" onclick="javascript:ButtonFormatter()">Formatter</button></dd>
+            <dd><button class="span-3 sexybutton sexysimple sexysmall" onclick="javascript:ButtonReload()">Reload</button></dd>
+            <dd><button class="span-3 sexybutton sexysimple sexysmall sexyblack2" onclick="javascript:ButtonSave()">Save</button></dd>
           </dl>
         </div>
 
         <div class="span-5">
           <dl class="column">
-            <dt><label><img src="./icon/tag_stroke_12x12.png" />Tag Actions</label></dt>
-            <dd><input class="span-3" onclick="javascript:ButtonApply()" type="submit" value="Select Apply"></dd>
-            <dd><input class="span-3" onclick="javascript:ButtonAllApply()" type="submit" value="All Apply"></dd>
+            <dt><label><img src="./icon/tag_stroke_12x12.png">Tag Actions</label></dt>
+            <dd><button class="span-3 sexybutton sexysimple sexysmall" onclick="javascript:ButtonApply()">Select Apply</button></dd>
+            <dd><button class="span-3 sexybutton sexysimple sexysmall" onclick="javascript:ButtonAllApply()">All Apply</button></dd>
           </dl>
           <dl class="column">
-            <dt><a href="javascript:wb.find('')"><label><img src="./icon/magnifying_glass_12x12.png" />Find Actions</label></a></dt>
-            <dd><input class="span-3" onclick="javascript:ButtonFindTags()" type="submit" value="Tags"></dd>
-            <dd><input class="span-3" onclick="javascript:ButtonFindRegistDate()" type="submit" value="RegistDate"></dd>
+            <dt><a href="javascript:wb.find('')"><label><img src="./icon/magnifying_glass_12x12.png">Find Actions</label></a></dt>
+            <dd><button class="span-3 sexybutton sexysimple sexysmall" onclick="javascript:ButtonFindTags()">Tags</button></dd>
+            <dd><button class="span-3 sexybutton sexysimple sexysmall" onclick="javascript:ButtonFindRegistDate()">RegistDate</button></dd>
           </dl>
         </div>
+
+        <hr class="space">
+
       </div>
 
     </fieldset>
