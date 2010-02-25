@@ -1,92 +1,109 @@
-<html>
- 
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="ja">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <link type="text/css" rel="stylesheet" href="./SimpleTagCloud.css">
-  <script type="text/javascript" src="../prototype.js"></script>
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+
+  <title>SimpleTagCloud</title>
+
+  <script type="text/javascript" src="./prototype.min.js"></script>
   <script type="text/javascript" src="../wblib.js"></script>
+
+  <link type="text/css" rel="stylesheet" href="./SimpleTagCloud.css">
+  <link type="text/css" rel="stylesheet" href="./skin/tagCloud_01.css">
 </head>
-
 <body>
+
   <script type="text/javascript">
-    var limit = 1000; // limit search items
-    var flag  = true; //
-    var f_min = 8;  // px, min font size at c_min
-    var f_max = 28; // px, max font size at c_max
+  <!--
 
-    ////////////////////////////////////////////////////////////////////////////
+    // 先頭から最大何個のファイルを調べるか。
+    var SearchFileLimit = 2500;
+    // ファイルのタグ更新時にタグクラウドを更新、する(true) or しない(false)。
+    var ModifiedUpdate = false;
 
-    var tags  = {};
-    var c_min = Math.log(1);
-    var c_max = Math.log(129);
 
-    var make = function(){
-      $E("view").innerHTML = "";
-      var tags = get();
-      for (var tag in tags){
-        add(tag, tags[tag], calc(tags[tag]));
-      };
-    };
-
-    var get = function(){
-      tags = {};
-      var max = (wb.getFindInfo().result > limit)? limit: -1;
-      wb.getInfos(0, max, '', '', mode).pluck('tags').flatten().sort().each(function(tag){
-        tags[tag] = ++tags[tag] || 1;
+    var GetTagsData = function(){
+      var TagsData = {};
+      var getTagsMax = (wb.getFindInfo().result > SearchFileLimit)? SearchFileLimit: -1;
+      wb.getInfos(0, getTagsMax).pluck('tags').flatten().each(function(tag){
+        TagsData[tag] = ++TagsData[tag] || 1;
       });
-      return tags;
+      return TagsData;
     };
 
-    var add = function(title, length, size){
-      new Insertion.Bottom(
-        $E("view"),
-        "<li><a style='font-size: " + size + "px' title='" + length + "items'" + 
-              " href='javascript:wb.find(\"" + wb.htmlDecode(title) + "\")'>" + title + "</a></li>"
-      );
+    var AddTagCloud = function(title, length, level){
+      $E("TagCloud").innerHTML +=
+        "<li class='level" + level + "'><a href='javascript:wb.find(\"" + wb.htmlDecode(title) + "\")'>" + title + " (" + length + ")" + "</a></li>";
     };
 
-    // via. http://www.magicvox.net/archive/2008/04091135/
-    var calc = function(cnt){
-      return (f_min + (f_max - f_min) * (Math.log(cnt) - c_min) / (c_max - c_min));
-    };
-
-    var toggle = function(){
-      var button = $E("mode");
-      if (flag){
-        button.innerHTML = "follow";
-        wb.onExtensionUpdated = function(){
-          if (wb.getFocusThum() == 0) return;
-          make();
-        };
-        make();
-      } else {
-        button.innerHTML = "fixed";
-        wb.onExtensionUpdated = function(){};
+    var f_max = 1, f_min = 6, f_diff = (f_max - f_min);
+    var MakeTagCloud = function(){
+      var TagsHash = $H(GetTagsData());
+      var TagsValues = TagsHash.values();
+      var l_max = Math.log(TagsValues.max()), l_min = Math.log(TagsValues.min()), l_diff = (l_max - l_min);
+      if (l_diff == 0) l_diff = 1;
+      var calc = function(length){
+        return (((Math.log(length) - l_min) / l_diff) * f_diff + f_min);
       };
-      flag = !flag;
+
+      $E("TagCloud").innerHTML = "";
+      TagsHash.each(function(pair){
+        AddTagCloud(pair.key, pair.value, Math.round(calc(pair.value)));
+      });
     };
 
-    wb.onSkinEnter  = make;
-    wb.onModifyTags = make;
+
+    var AutoFollowToggle = function (){
+      var AutoFollowIcon = $E("AutoFollowIcon");
+      if (wb.onExtensionUpdated === Prototype.emptyFunction)
+      {
+        AutoFollowIcon.src = AutoFollowSrc.off;
+        AutoFollowIcon.alt = AutoFollowAlt.off;
+        wb.onExtensionUpdated = MakeTagCloud;
+      }
+      else
+      {
+        AutoFollowIcon.src = AutoFollowSrc.on;
+        AutoFollowIcon.alt = AutoFollowAlt.on;
+        wb.onExtensionUpdated = Prototype.emptyFunction;
+      };
+    };
+    var AutoFollowSrc = {
+      on:  "./icon/play_alt_24x24.png",
+      off: "./icon/minus_alt_24x24.png"
+    };
+    var AutoFollowAlt = {
+      on:  "AutoFollow Start",
+      off: "AutoFollow Stop"
+    };
+
+
+    wb.onSkinEnter = MakeTagCloud;
+    wb.onExtensionUpdated = Prototype.emptyFunction;
+    wb.onModifyTags = (ModifiedUpdate)? MakeTagCloud: Prototype.emptyFunction;
 
     var $E = function (id) { return document.getElementById(id) };
-</script>
 
-<!-- 表示エリア -->
-<div id="command">
-  [<a id="mode"   href="javascript:toggle()">fixed</a>]
-  [<a id="update" href="javascript:make()">update</a>]
-</div>
-<ul id="view"></ul>
+  // -->
+  </script>
 
-<!-- コンフィグ -->
-<div id="config">
-  skin-version : 1;
-  thum-width   : 0;
-  thum-height  : 0;
-  thum-column  : 0;
-  thum-row     : 0;
-</div>
+  <ul id="TagCloud" class="tagCloud"></ul>
+
+  <div id="Button">
+    <a href="javascript:AutoFollowToggle()"><img src="./icon/play_alt_24x24.png" alt="AutoFollow Start" id="AutoFollowIcon"></a>
+    <a href="javascript:wb.find('')"><img src="./icon/home_24x24.png" alt="Clear"></a>
+    <a href="javascript:MakeTagCloud()"><img src="./icon/reload_24x28.png" alt="Update"></a>
+  </div>
+
+  <div id="config">
+    skin-version : 1;
+    thum-width   : 0;
+    thum-height  : 0;
+    thum-column  : 0;
+    thum-row     : 0;
+  </div>
+
 </body>
-
 </html>

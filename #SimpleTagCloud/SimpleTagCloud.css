@@ -1,31 +1,41 @@
-body {
-    background-color: #333;
-    margin: 0;
+body
+{
+  margin: 0 0 !important;
 }
 
-a {
-    color: #15ADFF;
-    cursor: pointer;
-    text-decoration: none;
+.tagCloud
+{
+  text-align: center !important;
 }
 
-#view {
-    margin: 0px 10px;
-    word-break: break-all;
+.tagCloud li
+{
+  margin-right: 5px !important;
+
+  /* http://p2b.jp/200912-tagcloud-with-word-break-and-white-space */
+  white-space: nowrap;
+  zoom: 1;
 }
 
-#view li {
-    display: inline;
-    margin: 0 8px 0 0;
-    padding: 0;
+a img
+{
+  border: none;
 }
 
-#command {
-    color: #888;
-    text-align: right;  
-    margin: 5px 5px 0;
+#Button
+{
+  position: fixed;
+  bottom: 5px;
+  right: 10px;
+  z-index: 100;
 }
 
-#command a {
-    color: #ccc;
+#AutoFollowIcon{
+  margin-right: 10px;
 }
+
+#config
+{
+  display: none;
+}
+
