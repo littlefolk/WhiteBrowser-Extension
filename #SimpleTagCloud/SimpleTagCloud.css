@@ -30,8 +30,19 @@ a img
   z-index: 100;
 }
 
+label
+{
+  margin-right: 15px;
+}
+
+#TagCloudSkinSelector
+{
+  filter: alpha(opacity=60);
+  -ms-filter: "alpha(opacity=60)";
+}
+
 #AutoFollowIcon{
-  margin-right: 10px;
+  margin-right: 15px;
 }
 
 #config

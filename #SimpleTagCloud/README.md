@@ -11,9 +11,27 @@
  Buttons
 ---------
 
+### ![Skin Select](./icon/user_12x16.png) ###
+
+タグクラウドのスキンの切り替え。
+アイコンをクリックして表示されるセレクトボックスから選択する。もう一度押されるとセレクトボックスは非表示になる。
+
+表示例は[Tag Cloudのスタイル](http://3ping.org/2007/10/20/1428)を参考にして下さい。
+
 ### ![AutoFollow Start](./icon/play_alt_24x24.png) ![Stop](./icon/minus_alt_24x24.png) ###
 
 画面が変更される度に自動的にタグクラウドが更新されるようになり、もう一度押されるとストップする。
+
+### ![Sort](./icon/equalizer_24x24.png) ###
+
+現在のタグクラウドの表示順を変更する。
+クリックするたびに、以下の並び換えが適用されていく。
+
+  * 件数でソート
+  * 件数でソート(逆順)
+  * シャフル
+
+なお、タグクラウドが更新された後までは適用されない。
 
 ### ![Clear](./icon/home_24x24.png) ###
 
@@ -28,11 +46,6 @@
 --------
 
 SimpleTagCloud.htm自体を編集して下さい。
-タグクラウドの表示例は[Tag Cloudのスタイル](http://3ping.org/2007/10/20/1428)を参考にして下さい。
-
-    // タグクラウドの見栄えを変更する。
-    // CSSのファイル名(tagCloud_01.css)の数値を変更する(01から13まで)。
-    <link type="text/css" rel="stylesheet" href="./skin/tagCloud_01.css">
 
     // 先頭から最大何個のファイルをタグクラウド作成のデータとして調べるか。
     var SearchFileLimit = 2500;
@@ -45,11 +58,11 @@ SimpleTagCloud.htm自体を編集して下さい。
 
 解決策募集中。
 
-  * CSSの切り替えフォーム
-  * シャッフルして表示
-  * タグ情報のキャッシュ
+  * AND・OR・NOT検索
+  * 変更した表示順の持続
   * タグクラウド作成アルゴリズム
-  * 時間軸の導入
+  * タグ情報のキャッシュ
+  * 時間軸
 
 
  System Requirements 
@@ -63,16 +76,23 @@ SimpleTagCloud.htm自体を編集して下さい。
  Version
 ---------
 
+### v2.1 (2010/03/01) ###
+
+  * スキンの切り替えを追加
+  * タグクラウドのHTML作成を効率化
+  * タグクラウドのソート＆シャッフル
+    * via. [最速インターフェース研究会 :: 実践JavaScriptで配列をシャッフルする方法リファクタリング](http://la.ma.la/blog/diary_200608300350.htm)
+
 ### v2.0 (2010/02/26) ###
 
 全面書き直し
 
   * タグクラウドの見栄えを複数のCSSから選べるように
-    * CSSに[Tag Cloudのスタイル](http://3ping.org/2007/10/20/1428)を使用
-    * 改行時の見栄えを変更([タグクラウドの日本語文字の改行を制御したい](http://p2b.jp/200912-tagcloud-with-word-break-and-white-space))
+    * via. [Tag Cloudのスタイル](http://3ping.org/2007/10/20/1428)
+    * via. [タグクラウドの日本語文字の改行を制御したい](http://p2b.jp/200912-tagcloud-with-word-break-and-white-space)
   * モードの廃止
   * ボタンをアイコンに変更
-    * [Iconic](http://somerandomdude.com/projects/iconic/)を使用
+    * via. [Iconic](http://somerandomdude.com/projects/iconic/)
   * ドキュメントの形式を変更
   * prototype.jsのversion1.6.1を同梱
 
@@ -106,6 +126,8 @@ prototype.jsが最新で無い場合にエラーが出てたのを修正しま�
   * [タグクラウドのフォントサイズの計算式について - Open MagicVox.net](http://www.magicvox.net/archive/2008/04091135/)
   * [Tag Cloudのスタイル](http://3ping.org/2007/10/20/1428)
   * [タグクラウドの日本語文字の改行を制御したい](http://p2b.jp/200912-tagcloud-with-word-break-and-white-space)
+  * [最速インターフェース研究会 :: 実践JavaScriptで配列をシャッフルする方法リファクタリング](http://la.ma.la/blog/diary_200608300350.htm)
+  * [Particletree ≫ Dynamic CSS Changes](http://particletree.com/notebook/dynamic-css-changes/)
 
 <!-- vim: set sw=2 sts=2 ft=markdown : -->
 

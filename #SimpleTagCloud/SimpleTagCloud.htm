@@ -11,7 +11,7 @@
   <script type="text/javascript" src="../wblib.js"></script>
 
   <link type="text/css" rel="stylesheet" href="./SimpleTagCloud.css">
-  <link type="text/css" rel="stylesheet" href="./skin/tagCloud_01.css">
+  <link type="text/css" rel="stylesheet" href="./skin/tagCloud_01.css" id="TagCloudSkin">
 </head>
 <body>
 
@@ -33,11 +33,6 @@
       return TagsData;
     };
 
-    var AddTagCloud = function(title, length, level){
-      $E("TagCloud").innerHTML +=
-        "<li class='level" + level + "'><a href='javascript:wb.find(\"" + wb.htmlDecode(title) + "\")'>" + title + " (" + length + ")" + "</a></li>";
-    };
-
     var f_max = 1, f_min = 6, f_diff = (f_max - f_min);
     var MakeTagCloud = function(){
       var TagsHash = $H(GetTagsData());
@@ -48,10 +43,86 @@
         return (((Math.log(length) - l_min) / l_diff) * f_diff + f_min);
       };
 
-      $E("TagCloud").innerHTML = "";
-      TagsHash.each(function(pair){
-        AddTagCloud(pair.key, pair.value, Math.round(calc(pair.value)));
-      });
+      $E("TagCloud").innerHTML = TagsHash.map(function(pair){
+          return "<li class='level" + Math.round(calc(pair.value)) + "'>" + 
+                   "<a href='javascript:wb.find(\"" + wb.htmlDecode(pair.key) + "\")'>" + pair.key + " (" + pair.value + ")" + "</a>" + 
+                 "</li>";
+      }).join("");
+    };
+
+
+    var TagCloudSkinSetting = "TagCloudSkin.txt"
+
+    var ReadTagCloudSkin = function(){
+      try {
+        var f = wb.readFile(TagCloudSkinSetting).join("");
+        return (!(f) || !((1 <= f) && (f <= 13)))? 1: f;
+      } catch (e) {
+        ErrorMessage("ReadTagCloudSkin (" + e.name + ").");
+      };
+    };
+
+    var SaveTagCloudSkin = function(i){
+      try {
+        wb.writeFile(TagCloudSkinSetting, parseInt(i, 10), 1);
+      } catch (e) {
+        ErrorMessage("SaveTagCloudSkin (" + e.name + ").");
+      };
+    };
+
+    var LoadTagCloudSkin = function(){
+      var i = ReadTagCloudSkin();
+      ChangeTagCloudSkin(i);
+      $E("TagCloudSkinSelector").selectedIndex = --i;
+    };
+
+    var ChangeTagCloudSkin = function(i){
+      if (!i) i = $F("TagCloudSkinSelector");
+      $E("TagCloudSkin").href = "./skin/tagCloud_" + (("00" + i)).slice(-2) + ".css";;
+      SaveTagCloudSkin(i);
+    };
+
+    var ToggleTagCloudSkinSelector = function(){
+      $("TagCloudSkinSelector").toggle();
+    };
+
+
+    var RoundrobinTagCloud = function(callbacks){
+      var i = 0, l = callbacks.length;
+      return function(){
+        if (++i >= l) i = 0;
+        var that = $("TagCloud");
+        ((callbacks[i]).call(this, that.childElements())).each(function(elem){
+          that.insert(elem);
+        });
+      };
+    };
+
+    var SortTagCloud = RoundrobinTagCloud([
+       function(thats){
+        return thats.shuffle()
+      }
+      ,function(thats){
+        return thats.sortBy(function(e){
+          return -parseInt(e.innerText.match(/\((\d+)\)/)[1]);
+        });
+      }
+      ,function(thats){
+        return thats.sortBy(function(e){
+          return -parseInt(e.innerText.match(/\((\d+)\)/)[1]);
+        }).reverse();
+      }
+    ]);
+
+    Array.prototype.shuffle = function() {
+      var i = this.length;
+      while(i){
+        var j = Math.floor(Math.random()*i);
+        var t = this[--i];
+        this[i] = this[j];
+        this[j] = t;
+      }
+      return this;
     };
 
 
@@ -80,7 +151,10 @@
     };
 
 
-    wb.onSkinEnter = MakeTagCloud;
+    wb.onSkinEnter = function(){
+      LoadTagCloudSkin();
+      MakeTagCloud();
+    };
     wb.onExtensionUpdated = Prototype.emptyFunction;
     wb.onModifyTags = (ModifiedUpdate)? MakeTagCloud: Prototype.emptyFunction;
 
@@ -92,7 +166,28 @@
   <ul id="TagCloud" class="tagCloud"></ul>
 
   <div id="Button">
+    <label>
+      <a href="javascript:ToggleTagCloudSkinSelector()"><img src="./icon/user_12x16.png" alt="TagCloudSkin Select"></a>
+      <select onChange="javascript:ChangeTagCloudSkin()" id="TagCloudSkinSelector" style="display:none;">
+        <option value="01">01</option>
+        <option value="02">02</option>
+        <option value="03">03</option>
+        <option value="04">04</option>
+        <option value="05">05</option>
+        <option value="06">06</option>
+        <option value="07">07</option>
+        <option value="08">08</option>
+        <option value="09">09</option>
+        <option value="10">10</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
+        <option value="13">13</option>
+      </select>
+    </label>
+
     <a href="javascript:AutoFollowToggle()"><img src="./icon/play_alt_24x24.png" alt="AutoFollow Start" id="AutoFollowIcon"></a>
+
+    <a href="javascript:SortTagCloud()"><img src="./icon/equalizer_24x24.png" alt="Sort"></a>
     <a href="javascript:wb.find('')"><img src="./icon/home_24x24.png" alt="Clear"></a>
     <a href="javascript:MakeTagCloud()"><img src="./icon/reload_24x28.png" alt="Update"></a>
   </div>
