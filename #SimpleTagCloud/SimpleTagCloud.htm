@@ -51,11 +51,9 @@
     };
 
 
-    var TagCloudSkinSetting = "TagCloudSkin.txt"
-
     var ReadTagCloudSkin = function(){
       try {
-        var f = wb.readFile(TagCloudSkinSetting).join("");
+        var f = wb.getProfile("TagCloudSkinSetting", 1);
         return (!(f) || !((1 <= f) && (f <= 13)))? 1: f;
       } catch (e) {
         ErrorMessage("ReadTagCloudSkin (" + e.name + ").");
@@ -64,7 +62,7 @@
 
     var SaveTagCloudSkin = function(i){
       try {
-        wb.writeFile(TagCloudSkinSetting, parseInt(i, 10), 1);
+        wb.writeProfile("TagCloudSkinSetting", parseInt(i, 10));
       } catch (e) {
         ErrorMessage("SaveTagCloudSkin (" + e.name + ").");
       };
