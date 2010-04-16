@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="./blueprint/screen.css" type="text/css" media="screen, projection">
   <!--[if lt IE 8]><link rel="stylesheet" href="./blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
 
-  <link rel="stylesheet" href="./SexyButtons/sexybuttons.css" type="text/css">
+  <link rel="stylesheet" href="./awesome-buttons/awesome-buttons.css" type="text/css">
 
   <style type="text/css">
   <!--
@@ -85,10 +85,15 @@
     height: 105px !important;
   }
 
-  .sexybutton.sexysimple
-  {
+  .awesome {
+    width: 100px !important;
     color: #bbbbbb !important;
-    background-color: #000000 !important;
+    font-size: 10px !important;
+  }
+
+  .awesome:focus,
+  .awesome:hover {
+    color: #ffffff !important;
   }
 
   -->
@@ -236,22 +241,22 @@
         <div class="span-4">
           <dl class="column">
             <dt><label><img src="./icon/document_stroke_12x12.png">File Actions</label></dt>
-            <dd><button class="span-3 sexybutton sexysimple sexysmall" onclick="javascript:ButtonFormatter()">Formatter</button></dd>
-            <dd><button class="span-3 sexybutton sexysimple sexysmall" onclick="javascript:ButtonReload()">Reload</button></dd>
-            <dd><button class="span-3 sexybutton sexysimple sexysmall sexyblack2" onclick="javascript:ButtonSave()">Save</button></dd>
+            <dd><button class="awesome" onclick="javascript:ButtonFormatter()">Formatter</button></dd>
+            <dd><button class="awesome" onclick="javascript:ButtonReload()">Reload</button></dd>
+            <dd><button class="awesome" onclick="javascript:ButtonSave()">Save</button></dd>
           </dl>
         </div>
 
         <div class="span-5">
           <dl class="column">
             <dt><label><img src="./icon/tag_stroke_12x12.png">Tag Actions</label></dt>
-            <dd><button class="span-3 sexybutton sexysimple sexysmall" onclick="javascript:ButtonApply()">Select Apply</button></dd>
-            <dd><button class="span-3 sexybutton sexysimple sexysmall" onclick="javascript:ButtonAllApply()">All Apply</button></dd>
+            <dd><button class="awesome" onclick="javascript:ButtonApply()">Select Apply</button></dd>
+            <dd><button class="awesome" onclick="javascript:ButtonAllApply()">All Apply</button></dd>
           </dl>
           <dl class="column">
             <dt><a href="javascript:wb.find('')"><label><img src="./icon/magnifying_glass_12x12.png">Find Actions</label></a></dt>
-            <dd><button class="span-3 sexybutton sexysimple sexysmall" onclick="javascript:ButtonFindTags()">Tags</button></dd>
-            <dd><button class="span-3 sexybutton sexysimple sexysmall" onclick="javascript:ButtonFindRegistDate()">RegistDate</button></dd>
+            <dd><button class="awesome" onclick="javascript:ButtonFindTags()">Tags</button></dd>
+            <dd><button class="awesome" onclick="javascript:ButtonFindRegistDate()">RegistDate</button></dd>
           </dl>
         </div>
 

@@ -151,6 +151,13 @@ AutoTagging.htm自体を編集して下さい。
  Version
 ---------
 
+### v1.2 (2010/04/16) ###
+
+デザインの変更。
+
+  * ボタンデザイン変更
+    * [gr2m's awesome-buttons at master - GitHub](http://github.com/gr2m/awesome-buttons)を使用
+
 ### v1.1 (2010/02/24) ###
 
 構成・デザインの変更。
