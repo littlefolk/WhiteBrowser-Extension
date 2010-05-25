@@ -1,0 +1,25 @@
+{
+  ".(avi|wmv|mpg|rm|rmvb|flv|asf|mpeg|mkv|swf|ogm|mp4|mov|avs|divx|3gp|3g2|m4v)$" : [
+    "AutoTagging-Movie"
+  ],
+  ".(mp3|m4a|aac)$" : [
+    "AutoTagging-Music"
+  ],
+  ".(jpg|png|bmp)$" : [
+    "AutoTagging-Image"
+  ],
+  ".zip$" : [
+    "AutoTagging-Archive"
+  ],
+  ".*" : [
+    "AutoTagging-All"
+  ],
+  "dog" : [
+    "AutoTagging-Animal",
+    "Œ¢"
+  ],
+  "cat" : [
+    "AutoTagging-Animal",
+    "”L"
+  ]
+}

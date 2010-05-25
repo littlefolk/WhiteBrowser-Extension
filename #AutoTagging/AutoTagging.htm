@@ -4,6 +4,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta http-equiv="Content-Script-Type" content="text/javascript">
   <meta http-equiv="Content-Style-Type" content="text/css">
+  <meta http-equiv="X-UA-Compatible" content="IE=8">
 
   <title>AutoTagging</title>
 
@@ -15,86 +16,42 @@
   <link rel="stylesheet" href="./blueprint/screen.css" type="text/css" media="screen, projection">
   <!--[if lt IE 8]><link rel="stylesheet" href="./blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
 
-  <link rel="stylesheet" href="./awesome-buttons/awesome-buttons.css" type="text/css">
-
   <style type="text/css">
   <!--
 
-  *
-  {
-    scrollbar-face-color: #101010;
-    scrollbar-3dlight-color: #999999;
-    scrollbar-darkshadow-color: #999999;
-    scrollbar-highlight-color: #101010;
-    scrollbar-shadow-color: #101010;
-    scrollbar-arrow-color: #999999;
-    scrollbar-track-color: #101010;
-  }
+    body {
+      color: #fff;
+      background: #222;
+    }
+    textarea {
+      color: #ccc;
+      background: transparent;
+      border-color: #999;
+      font-size: 1.3em;
+    }
+      textarea:focus {
+        color: #fff;
+        border-color: #eee;
+      }
+    dd {
+      margin-left: 15px;
+    }
+    label img {
+      margin: 0 5px 0 0;
+    }
 
-  body,
-  textarea
-  {
-    background-color: #101010 !important;
-    background-image: none !important;
-    color: #bbbbbb !important;
-    border-color: #999999 !important;
-  }
+    #header {
+      margin-top: 7px;
+    }
+      #message {
+        font-size: 80%;
+        color: #999;
+        margin-left: 5px;
+      }
 
-  a
-  {
-    text-decoration: none;
-  }
-
-  fieldset
-  {
-    text-align: left;
-    border-style: none solid !important;
-    margin: 0 0 !important;
-    padding: 0 1.4em !important;
-  }
-
-  dt,
-  dd
-  {
-    margin-bottom: 3px;
-  }
-
-  label
-  {
-    color: #dddddd !important;
-  }
-
-  img
-  {
-    margin-right: 3px;
-  }
-
-  input
-  {
-    border-width: 1px;
-    border-style: solid;
-  }
-
-  .column div
-  {
-    padding-left: 5px;
-  }
-
-  #jsonview
-  {
-    height: 105px !important;
-  }
-
-  .awesome {
-    width: 100px !important;
-    color: #bbbbbb !important;
-    font-size: 10px !important;
-  }
-
-  .awesome:focus,
-  .awesome:hover {
-    color: #ffffff !important;
-  }
+    .left {
+      text-align: right;
+    }
 
   -->
   </style>
@@ -105,93 +62,99 @@
   <script type="text/javascript">
   <!--
 
+  // Setting
     // フルパスを対象にする(true) or ファイル名を対象にする(false)。 
     var FindFullPath = true;
-    // エラーメッセージをポップアップで表示、する(true) or しない(false)。
-    var ErrorMessagePopup = false;
 
+  // JSON
     var jsonData, jsonHash, jsonKeys;
     var jsonFilePath = "AutoTagging." + wb.getDBName().slice(0, -3) + ".json";
     var jsonLoad = function(){
-      jsonData = jsonParseFile();
-      jsonHash = $H(jsonData);
-      jsonKeys = jsonHash.keys().map(function(str){ return new RegExp(str, "i") });
-      wb.trace("AutoTagging Load, " + jsonKeys.length + "keys.");
+      try {
+        jsonData = jsonParseFile();
+        jsonHash = $H(jsonData);
+        jsonKeys = jsonHash.keys().map(function(str){ return new RegExp(str, "i") });
+        Logger("\"" + jsonFilePath + "\" Load, " + jsonKeys.length + "keys");
+      } catch (e) {
+        Logger("jsonLoad " + e.name);
+      };
     };
     var jsonParseFile = function(){
-      try {
-        return (wb.readFile(jsonFilePath).join("") || '{"str": ["tag1","tag2"]}').evalJSON(true);
-      } catch (e) {
-        ErrorMessage("jsonParseFile (" + e.name + ").");
-        return {};
-      };
+      return (wb.readFile(jsonFilePath).join("") || '{"FileName": ["tag1","tag2"], ".*": ["Edit_AutoTagging"]}').evalJSON(true);
     };
     var jsonSaveFile = function(data){
-      try {
         wb.writeFile(jsonFilePath, new Json.Formatter(data.evalJSON(true)).value, 1);
-      } catch (e) {
-        ErrorMessage("jsonSaveFile (" + e.name + ").");
-      };
     };
     var jsonFindTags = function(str){
       return jsonKeys.select(function(key){ return key.test(str) })
                      .map(function(key){ return jsonHash.get(key.source) }).flatten();
     };
 
+  // Tagging
     var AutoTagging = function(id){
       var mv = wb.getInfo(id);
-      var SearchPath = ((FindFullPath) ? [mv.drive, mv.dir, mv.title, mv.ext] : [mv.title, mv.ext]).join("");
+      var SearchPath = ((FindFullPath)? [mv.drive, mv.dir, mv.title, mv.ext]: [mv.title, mv.ext]).join("");
       jsonFindTags(SearchPath).each(function(tag){ wb.addTag(id, wb.htmlDecode(tag)) });
     };
 
-    var ErrorMessage = function(str){
-      str = "AutoTagging ERROR, " + str;
-      (ErrorMessagePopup)?
-        alert(str):
-        wb.trace(str);
-    };
-
-    wb.onSkinEnter = jsonLoad;
-    wb.onRegistedFile = AutoTagging;
-    window.onload = function(){ SetTextarea(jsonData) };
-
   // -->
   </script>
-
   <script type="text/javascript" defer="defer">
   <!--
 
+  // Util
     var $E = function (id) { return document.getElementById(id) };
+
+  // View
+    var Logger = function(str){
+      $E("message").innerText = "(" + str + ")";
+    };
     var SetTextarea = function(data){
       Form.Element.setValue($E("jsonview"), new Json.Formatter(data).value);
     };
     var GetTextarea = function(data){
       return $F($E("jsonview"));
     };
+    var ResizeTextarea = function(){
+      var clientHeight = document.documentElement.clientHeight;
+      if (clientHeight > 0)
+        $E("jsonview").setStyle({height: clientHeight - 55});
+    };
 
+  // File Actions
     var ButtonFormatter = function(){
       try {
         SetTextarea(GetTextarea().evalJSON(true));
       } catch (e) {
-        ErrorMessage("ButtonFormatter (" + e.name + ").");
+        Logger("ButtonFormatter " + e.name);
       };
     };
     var ButtonReload = function(){
-      jsonLoad();
-      SetTextarea(jsonData);
+      try {
+        jsonLoad();
+        SetTextarea(jsonData);
+      } catch (e) {
+        Logger("ButtonReload " + e.name);
+      };
     };
     var ButtonSave = function(){
-      jsonSaveFile(GetTextarea());
-      ButtonReload();
+      try {
+        jsonSaveFile(GetTextarea());
+        ButtonReload();
+      } catch (e) {
+        Logger("ButtonSave " + e.name);
+      };
     };
 
-    var ButtonApply = function(flag){
+  // Tag Actions
+    var ButtonSelApply = function(flag){
       wb.getSelectThums().each(AutoTagging);
     };
     var ButtonAllApply = function(flag){
       wb.getInfos(0, -1).each(function(wb){ AutoTagging(wb.id) });
     };
 
+  // Find Actions
     var ButtonFind = function(keys){
       var i = 0, l = keys.length;
       return function(){
@@ -212,59 +175,52 @@
       ,"{tag = ''}" // タグの付いていないファイル
     ]);
 
+  // Window & WB
+    wb.onSkinEnter = jsonLoad;
+    wb.onRegistedFile = AutoTagging;
+    window.onload = function(){
+      SetTextarea(jsonData)
+      ResizeTextarea();
+    };
+    window.onresize = ResizeTextarea;
+
   // -->
   </script>
 
 
 
   <div class="container">
+    <div class="column prepend-4" id="header">
+      <label><img src="./icon/key_stroke_12x12.png">Json Data<span id="message""></span></label>
+    </div>
 
-    <fieldset>
-
-      <div class="column span-13 border">
-
-        <hr class="space">
-
-        <p>
-          <label for="jsonview"><img src="./icon/key_stroke_12x12.png">Json Data</label><br>
-          <textarea name="jsonview" id="jsonview" rows="5" cols="20" class="span-13"></textarea>
-        </p>
-
-        <hr class="space">
-
+    <div class="column">
+      <div class="column span-4 left">
+        <dl>
+          <dt><label><img src="./icon/tag_stroke_12x12.png">Tag Actions</label></dt>
+          <dd><button class="awesome" onclick="javascript:ButtonSelApply()">Select Apply</button></dd>
+          <dd><button class="awesome" onclick="javascript:ButtonAllApply()">All Apply</button></dd>
+          <dd><hr class="space"></dd>
+          <dt><label><img src="./icon/magnifying_glass_12x12.png">Find Actions</label></dt>
+          <dd><button class="awesome" onclick="javascript:ButtonFindRegistDate()">Regist Date</button></dd>
+          <dd><button class="awesome" onclick="javascript:ButtonFindTags()">Tags</button></dd>
+        </dl>
       </div>
 
-      <div class="column span-10">
-
-        <hr class="space">
-
-        <div class="span-4">
-          <dl class="column">
-            <dt><label><img src="./icon/document_stroke_12x12.png">File Actions</label></dt>
-            <dd><button class="awesome" onclick="javascript:ButtonFormatter()">Formatter</button></dd>
-            <dd><button class="awesome" onclick="javascript:ButtonReload()">Reload</button></dd>
-            <dd><button class="awesome" onclick="javascript:ButtonSave()">Save</button></dd>
-          </dl>
-        </div>
-
-        <div class="span-5">
-          <dl class="column">
-            <dt><label><img src="./icon/tag_stroke_12x12.png">Tag Actions</label></dt>
-            <dd><button class="awesome" onclick="javascript:ButtonApply()">Select Apply</button></dd>
-            <dd><button class="awesome" onclick="javascript:ButtonAllApply()">All Apply</button></dd>
-          </dl>
-          <dl class="column">
-            <dt><a href="javascript:wb.find('')"><label><img src="./icon/magnifying_glass_12x12.png">Find Actions</label></a></dt>
-            <dd><button class="awesome" onclick="javascript:ButtonFindTags()">Tags</button></dd>
-            <dd><button class="awesome" onclick="javascript:ButtonFindRegistDate()">RegistDate</button></dd>
-          </dl>
-        </div>
-
-        <hr class="space">
-
+      <div class="column span-15">
+        <textarea name="jsonview" id="jsonview" rows="5" cols="20" class="span-15"></textarea>
       </div>
 
-    </fieldset>
+      <div class="column span-4 last">
+        <dl>
+          <dt><label><img src="./icon/document_stroke_12x12.png">File Actions</label></dt>
+          <dd><button class="awesome" onclick="javascript:ButtonFormatter()">Formatter</button></dd>
+          <dd><button class="awesome" onclick="javascript:ButtonReload()">Reload</button></dd>
+          <dd><button class="awesome" onclick="javascript:ButtonSave()">Save</button></dd>
+        </dl>
+      </div>
+
+    </div>
 
   </div>
 

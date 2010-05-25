@@ -4,58 +4,82 @@
  Summary
 ---------
 
-設定ファイルに基づき、ファイルの登録時などに自動的にタグ付けをするエクステンションです。
-WhitebrowserでエクステンションをAutoTaggingに設定しておけば、表示されていなくても動きます。
+設定ファイルに基づいて、ファイルの登録時などに自動的にタグ付けをするエクステンションです。
+エクステンションがAutoTaggingに設定されていれば、画面に表示されていなくても自動的にタグ付けされます。
 
 ### 主な機能 ###
 
-  * 登録時にファイル名を基にした自動タグ付け
-  * 表示中のファイルへの適用
-  * 簡易的な設定ファイルの編集環境
-  * タグ付け用検索候補
+  * ファイル名を基にした自動タグ付け
+    * 登録時・表示中のファイルへの適用
+  * データベース別の設定ファイル
+  * 簡易的な設定ファイルの編集画面
+
+
+ Data File
+-----------
+
+### Syntax ###
+
+ファイル名にマッチさせる正規表現を文字列にしたものをキー、追加するタグが要素の配列を値、としたオブジェクトをJSON形式で記述したもの。
+
+    {
+      "ファイル名にマッチさせる正規表現" : [
+        "追加するタグ1"
+      ],
+      "ファイル名にマッチさせる正規表現" : [
+        "追加するタグ1",
+        "追加するタグ2",
+        "追加するタグ3"
+      ]
+    }
+
+  * 上から順にマッチングしていく
+  * マッチングでは大文字小文字の違いは無視される
+
+
+#### Sample ####
+
+同梱の[AutoTagging.sample.json](./AutoTagging.sample.json)を参考にして下さい。
 
 
  Button
 --------
 
-### Json Data ###
-
-設定ファイルの表示・編集用のテキストエリア。
-
-
 ### File Actions ###
-
-設定ファイルの再読み込み・保存。
 
 #### Formatter ####
 
-テキストエリアの入力を整形して表示。
+  テキストエリアの内容を整形して表示しなおす。
 
 #### Reload ####
 
-ファイルを再読み込みしてテキストエリアに表示。
+  設定ファイルを再読み込みしてテキストエリアに表示する。
 
 #### Save ####
 
-テキストエリアで編集したものをファイルに書き込む。
+  テキストエリアの内容を設定ファイルに書き込む。
+
+
+### Json Data ###
+
+  設定ファイルの表示・編集用のテキストエリア。
+  編集した内容は、Saveを押して保存しないと反映されません。
 
 
 ### Tag Actions ###
 
-登録済みのファイルに自動タグ付けを適用する。
-
 #### Select Apply ####
 
-選択中のファイルに適用する。
+  選択中のファイルに自動タグ付けを適用する。
 
 #### All Apply ####
 
-表示されている全てのファイルに適用する。
+  表示されている全てのファイルに自動タグ付けを適用する。
 
 
 ### Find Actions ###
 
-押すたびに検索状態を切り変える。
+  押すたびに検索状態を切り変える。
 
 #### RegistDate ####
 
@@ -66,53 +90,7 @@ WhitebrowserでエクステンションをAutoTaggingに設定しておけば、
 
 #### Tags ####
 
-  * タグ無し
-
-
- Data File
------------
-
-### 保存場所 ###
-
-Whitebrowser本体のあるフォルダ\temp\AutoTagging.WBファイル名.json
-
-### 書式 ###
-
-設定ファイルはJSONフォーマットで記述され、全体としては一つのオブジェクトとして書かれる。
-
-    {}
-
-    // "cat and dog.mpg" => []
-
-オブジェクトのキーにはファイル名とマッチングさせる文字列を書き、値には書きこまれるタグの文字列を配列で書く。
-
-    {
-      "cat" : ["猫"]
-    }
-
-    // "cat and dog.mpg" => ["猫"]
-
-オブジェクトのペアが複数ある場合は上から順にマッチングしていく。
-
-    {
-      "dog" : ["犬"],
-      "cat" : ["猫"]
-    }
-
-    // "cat and dog.mpg" => ["犬", "猫"]
-
-キーの文字列は正規表現として解釈される。
-また大文字小文字の違いは無視される。
-
-    {
-      "dog" : ["犬"],
-      "cat" : ["猫"],
-      ".*" : ["ファイル"]
-    }
-
-    // "cat and dog.mpg" => ["犬", "猫", "ファイル"]
-    // "DOGDOGDOG.flv"   => ["犬", "ファイル"]
-    // "Pig.avi"         => ["ファイル"]
+  * タグの付いていないファイル
 
 
  Option
@@ -122,8 +100,6 @@ AutoTagging.htm自体を編集して下さい。
 
     // フルパスを対象にする(true) or ファイル名を対象にする(false)。 
     var FindFullPath = true;
-    // エラーメッセージをポップアップで表示、する(true) or しない(false)。
-    var ErrorMessagePopup = false;
 
 
  TODO
@@ -131,11 +107,8 @@ AutoTagging.htm自体を編集して下さい。
 
 解決策募集中。
 
+  * ドキュメント
   * デザイン
-  * テキストエリアのリサイズ
-      * http://espion.just-size.jp/archives/06/237175908.html
-      * http://p2b.jp/200903-autofit-textarea
-      * http://www.switchonthecode.com/tutorials/javascript-controls-resizeable-textbox-part-tres
   * 中途で放置されたFind Actionsの再開位置
   * 他のFind Actionsの検索条件案
 
@@ -151,22 +124,9 @@ AutoTagging.htm自体を編集して下さい。
  Version
 ---------
 
-### v1.2 (2010/04/16) ###
+### v2.0 (2010/05/26) ###
 
-デザインの変更。
-
-  * ボタンデザイン変更
-    * [gr2m's awesome-buttons at master - GitHub](http://github.com/gr2m/awesome-buttons)を使用
-
-### v1.1 (2010/02/24) ###
-
-構成・デザインの変更。
-
-  * 中途半端なHTMLだったのをHTML 4.01 Strictに
-  * ボタンデザイン変更
-    * [Sexy Buttons](http://code.google.com/p/sexybuttons/)を使用
-  * 上下に多少の空白を配置
-  * README.mdに動作確認環境を記述
+公開。
 
 ### v1.0 (2010/02/20) ###
 
@@ -180,7 +140,6 @@ AutoTagging.htm自体を編集して下さい。
   * [prototype.js](http://prototypejs.org/)
   * [blueprint](http://www.blueprintcss.org/)
   * [Iconic](http://somerandomdude.com/projects/iconic/)
-  * [sexybuttons](http://code.google.com/p/sexybuttons/)
   * [JsonFormatter.js](http://dara-j.asablo.jp/blog/2007/05/15/1509590)
 
 <!-- vim: set sw=2 sts=2 ft=markdown : -->
